@@ -1,61 +1,67 @@
 from flask import Flask, request, render_template, jsonify
 import joblib
 import pandas as pd
+import numpy as np
 import logging
 
 app = Flask(__name__)
-
-# Configurar el registro
 logging.basicConfig(level=logging.DEBUG)
 
-# Cargar el modelo entrenado (asegúrate de poner el nombre correcto)
-model = joblib.load('modelo_titanic.pkl')
-app.logger.debug('Modelo cargado correctamente.')
+# Carga modelos: scaler, PCA y KNN
+scaler = joblib.load('scalerTitanic.pkl')  # scaler para escalar features
+pca = joblib.load('pcaModelTitanic.pkl')                   # tu PCA
+knn = joblib.load('knnModelTitanic.pkl')                   # tu modelo KNN
+
+app.logger.debug('Scaler, PCA y KNN cargados correctamente.')
+
+most_important_cols = ['Sex_male', 'Age', 'Fare', 'Pclass', 'Cabin']
 
 @app.route('/')
 def home():
-    return render_template('formulario.html')  # tu HTML debe llamarse así
+    return render_template('formulario.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        # Obtener datos del formulario
-        gender = request.form['gender']       # 'male' o 'female'
-        age = float(request.form['age'])
-        fare = float(request.form['fare'])
-        pclass = int(request.form['pclass'])
-        cabin = request.form.get('cabin', '')  # opcional
+        gender = request.form.get('gender')
+        age = request.form.get('age', type=float)
+        fare = request.form.get('fare', type=float)
+        pclass = request.form.get('pclass', type=int)
+        cabin = request.form.get('cabin', '').strip()
 
-        # Procesar 'Sex_male' como variable dummy
+        if not gender or age is None or fare is None or not pclass:
+            return jsonify({'error': 'Faltan datos requeridos'}), 400
+
         sex_male = 1 if gender == 'male' else 0
+        cabin_bin = 1 if cabin else 0
 
-        # Procesar 'Cabin': puedes crear una variable binaria si tiene cabina o no
-        cabin_flag = 0
-        if cabin.strip() != '':
-            cabin_flag = 1
+        input_dict = {
+            'Sex_male': [sex_male],
+            'Age': [age],
+            'Fare': [fare],
+            'Pclass': [pclass],
+            'Cabin': [cabin_bin]
+        }
+        input_df = pd.DataFrame(input_dict)
+        app.logger.debug(f'Datos recibidos: {input_df}')
 
-        # Crear DataFrame con las columnas esperadas por el modelo
-        data = pd.DataFrame([[
-            sex_male,
-            age,
-            fare,
-            pclass,
-            cabin_flag
-        ]], columns=['Sex_male', 'Age', 'Fare', 'Pclass', 'Cabin'])
+        # Escalar
+        input_scaled = scaler.transform(input_df)
 
-        app.logger.debug(f'Data para predicción: \n{data}')
+        # Aplicar PCA
+        input_pca = pca.transform(input_scaled)
 
-        # Predecir con el modelo
-        prediction = model.predict(data)[0]
+        # Predecir con KNN
+        pred = knn.predict(input_pca)[0]
 
-        # Mapear predicción a texto
-        resultado = 'Sobrevivió' if prediction == 1 else 'No Sobrevivió'
+        categoria = 'Sobrevivió' if pred == 1 else 'No Sobrevivió'
 
-        return jsonify({'categoria': resultado})
+        return jsonify({'categoria': categoria})
 
     except Exception as e:
-        app.logger.error(f'Error en la predicción: {str(e)}')
-        return jsonify({'error': str(e)}), 400
+        app.logger.error(f'Error en predicción: {str(e)}')
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
