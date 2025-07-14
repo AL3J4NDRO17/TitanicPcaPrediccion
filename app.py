@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 # Carga modelos: scaler, PCA y KNN
 scaler = joblib.load('scalerTitanic.pkl')  # scaler para escalar features
 pca = joblib.load('pcaModelTitanic.pkl')                   # tu PCA
-knn = joblib.load('knnModelTitanic.pkl')                   # tu modelo KNN
+model = joblib.load('knnModelTitanic.pkl')                   # tu modelo KNN
 
 app.logger.debug('Scaler, PCA y KNN cargados correctamente.')
 
@@ -23,44 +23,45 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
+        # Recibir y limpiar datos
         gender = request.form.get('gender')
-        age = request.form.get('age', type=float)
-        fare = request.form.get('fare', type=float)
-        pclass = request.form.get('pclass', type=int)
-        cabin = request.form.get('cabin', '').strip()
+        age = float(request.form.get('age'))
+        fare = float(request.form.get('fare'))
+        pclass = int(request.form.get('pclass'))
+        cabin_raw = request.form.get('cabin', '').strip()
 
-        if not gender or age is None or fare is None or not pclass:
-            return jsonify({'error': 'Faltan datos requeridos'}), 400
+        # Procesar cabina: primera letra o 'U' si vacío
+        cabin_letter = cabin_raw[0].upper() if cabin_raw else 'U'
+        cabin_num = ord(cabin_letter)  # Convierte letra a número ordinal
 
+        # Convertir género a variable binaria
         sex_male = 1 if gender == 'male' else 0
-        cabin_bin = 1 if cabin else 0
 
-        input_dict = {
-            'Sex_male': [sex_male],
-            'Age': [age],
-            'Fare': [fare],
-            'Pclass': [pclass],
-            'Cabin': [cabin_bin]
-        }
-        input_df = pd.DataFrame(input_dict)
-        app.logger.debug(f'Datos recibidos: {input_df}')
+        # Crear DataFrame con las columnas que tu modelo espera
+        df = pd.DataFrame([[
+            sex_male,
+            age,
+            fare,
+            pclass,
+            cabin_num
+        ]], columns=['Sex_male', 'Age', 'Fare', 'Pclass', 'Cabin'])
 
         # Escalar
-        input_scaled = scaler.transform(input_df)
+        df_scaled = scaler.transform(df)
 
         # Aplicar PCA
-        input_pca = pca.transform(input_scaled)
+        df_pca = pca.transform(df_scaled)
 
-        # Predecir con KNN
-        pred = knn.predict(input_pca)[0]
+        # Predecir
+        prediction = model.predict(df_pca)
 
-        categoria = 'Sobrevivió' if pred == 1 else 'No Sobrevivió'
+        # Convertir predicción a texto
+        categoria = 'Sobrevivió' if prediction[0] == 1 else 'No Sobrevivió'
 
         return jsonify({'categoria': categoria})
 
     except Exception as e:
-        app.logger.error(f'Error en predicción: {str(e)}')
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e)}), 400
 
 
 if __name__ == '__main__':
