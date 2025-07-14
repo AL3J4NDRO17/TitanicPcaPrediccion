@@ -66,7 +66,18 @@
 
       <div class="form-group">
         <label for="cabin">Cabina:</label>
-        <input type="text" id="cabin" name="cabin" placeholder="Ej: C85 (opcional)" />
+        <select id="cabin" name="cabin">
+          <option value="">Sin cabina asignada</option>
+          <option value="A">Cubierta A</option>
+          <option value="B">Cubierta B</option>
+          <option value="C">Cubierta C</option>
+          <option value="D">Cubierta D</option>
+          <option value="E">Cubierta E</option>
+          <option value="F">Cubierta F</option>
+          <option value="G">Cubierta G</option>
+          <option value="T">Cubierta T (especial)</option>
+          <option value="U">Sin cabina</option>
+        </select>
       </div>
 
       <button type="submit">Predecir Supervivencia</button>
@@ -74,23 +85,9 @@
 
     <div id="loader">
       <svg width="40" height="40" viewBox="0 0 50 50">
-        <circle
-          cx="25"
-          cy="25"
-          r="20"
-          stroke="#333"
-          stroke-width="5"
-          fill="none"
-          stroke-linecap="round"
-        >
-          <animateTransform
-            attributeName="transform"
-            type="rotate"
-            dur="1s"
-            repeatCount="indefinite"
-            from="0 25 25"
-            to="360 25 25"
-          />
+        <circle cx="25" cy="25" r="20" stroke="#333" stroke-width="5" fill="none" stroke-linecap="round">
+          <animateTransform attributeName="transform" type="rotate" dur="1s" repeatCount="indefinite" from="0 25 25"
+            to="360 25 25" />
         </circle>
       </svg>
       <p>Cargando...</p>
