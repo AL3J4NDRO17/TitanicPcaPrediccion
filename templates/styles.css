@@ -1,0 +1,157 @@
+body {
+  font-family: "Georgia", serif; /* Fuente formal y clásica */
+  background-color: #f0f0f0; /* Fondo claro para el tema blanco y negro */
+  color: #333; /* Texto oscuro */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.container {
+  background-color: #ffffff; /* Fondo blanco para el formulario */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 600px; /* Formulario grande */
+  text-align: center;
+}
+
+.title {
+  color: #222;
+  margin-bottom: 10px;
+  font-size: 2.5em; /* Título grande */
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.subtitle {
+  color: #555;
+  margin-bottom: 30px;
+  font-size: 1.2em;
+}
+
+.form-group {
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #444;
+  font-size: 1.1em;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  width: calc(100% - 20px); /* Ajuste para padding */
+  padding: 12px 10px;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  font-size: 1em;
+  color: #333;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: #888;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  outline: none;
+}
+
+button {
+  background-color: #333; /* Botón oscuro */
+  color: #ffffff; /* Texto blanco */
+  padding: 15px 30px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 100%;
+  max-width: 280px; /* Ancho fijo para el botón */
+  margin-top: 20px;
+}
+
+button:hover {
+  background-color: #555;
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.result-message {
+  margin-top: 30px;
+  font-size: 1.4em;
+  font-weight: bold;
+  min-height: 1.4em; /* Para evitar saltos de diseño */
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .container {
+    padding: 25px;
+    max-width: 90%;
+  }
+
+  .title {
+    font-size: 2em;
+  }
+
+  .subtitle {
+    font-size: 1.1em;
+  }
+
+  button {
+    padding: 12px 25px;
+    font-size: 1.1em;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 1.8em;
+  }
+
+  .subtitle {
+    font-size: 1em;
+  }
+
+  label {
+    font-size: 1em;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select {
+    padding: 10px;
+    font-size: 0.9em;
+  }
+
+  button {
+    font-size: 1em;
+  }
+
+  .result-message {
+    font-size: 1.2em;
+  }
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Predicción de Supervivencia del Titanic</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">¿Sobrevivirías al Titanic?</h1>
+    <p class="subtitle">Introduce los datos del pasajero para predecir su destino.</p>
+    <form id="formulario" onsubmit="predecirSupervivencia(event)">
+      <div class="form-group">
+        <label for="gender">Género:</label>
+        <select id="gender" name="gender" required>
+          <option value="">Seleccionar</option>
+          <option value="male">Hombre</option>
+          <option value="female">Mujer</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="age">Edad:</label>
+        <input type="number" id="age" name="age" min="0" max="100" placeholder="Ej: 30" required>
+      </div>
+
+      <div class="form-group">
+        <label for="fare">Tarifa del Billete:</label>
+        <input type="number" id="fare" name="fare" step="0.01" min="0" placeholder="Ej: 50.75" required>
+      </div>
+
+      <div class="form-group">
+        <label for="pclass">Clase de Pasajero:</label>
+        <select id="pclass" name="pclass" required>
+          <option value="">Seleccionar</option>
+          <option value="1">Primera Clase</option>
+          <option value="2">Segunda Clase</option>
+          <option value="3">Tercera Clase</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="cabin">Número de Cabina:</label>
+        <input type="text" id="cabin" name="cabin" placeholder="Ej: C85 (opcional)">
+      </div>
+
+      <button type="submit">Predecir Supervivencia</button>
+    </form>
+    <p id="resultado" class="result-message"></p>
+  </div>
+
+  <script>
+    function predecirSupervivencia(event) {
+      event.preventDefault();
+      const gender = document.getElementById('gender').value;
+      const age = document.getElementById('age').value;
+      const fare = document.getElementById('fare').value;
+      const pclass = document.getElementById('pclass').value;
+      const cabin = document.getElementById('cabin').value;
+
+      // Validar que los campos requeridos no estén vacíos
+      if (!gender || !age || !fare || !pclass) {
+        document.getElementById('resultado').innerText = 'Por favor, complete todos los campos requeridos.';
+        document.getElementById('resultado').style.color = '#d9534f'; // Rojo para error
+        return;
+      }
+
+      fetch('/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `gender=${gender}&age=${age}&fare=${fare}&pclass=${pclass}&cabin=${cabin}`,
+      })
+      .then(response => response.json())
+      .then(data => {
+        const resultadoElement = document.getElementById('resultado');
+        if (data.error) {
+          resultadoElement.innerText = 'Error: ' + data.error;
+          resultadoElement.style.color = '#d9534f'; // Rojo para error
+        } else {
+          // Asumiendo que 'data.categoria' contendrá "Sobrevivió" o "No Sobrevivió"
+          if (data.categoria === 'Sobrevivió') {
+            resultadoElement.innerText = '¡El pasajero probablemente SOBREVIVIÓ!';
+            resultadoElement.style.color = '#5cb85c'; // Verde para éxito
+          } else if (data.categoria === 'No Sobrevivió') {
+            resultadoElement.innerText = 'El pasajero probablemente NO SOBREVIVIÓ.';
+            resultadoElement.style.color = '#d9534f'; // Rojo para no sobrevivió
+          } else {
+            resultadoElement.innerText = 'Resultado de la clasificación: ' + data.categoria;
+            resultadoElement.style.color = '#333'; // Color por defecto
+          }
+        }
+      })
+      .catch(error => {
+        const resultadoElement = document.getElementById('resultado');
+        resultadoElement.innerText = 'Error en la solicitud. Por favor, inténtelo de nuevo.';
+        resultadoElement.style.color = '#d9534f'; // Rojo para error
+        console.error('Error:', error);
+      });
+    }
+  </script>
+</body>
+</html>
