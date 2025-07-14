@@ -102,6 +102,31 @@ button:active {
   min-height: 1.4em; /* Para evitar saltos de diseño */
 }
 
+select optgroup {
+  font-weight: bold;
+  color: #222;
+  background-color: #eaeaea;
+} 
+button:hover {
+  background-color: #555;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+} 
+.result-message {
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.result-message.success {
+  background-color: #dff0d8;
+  color: #3c763d;
+}
+
+.result-message.fail {
+  background-color: #f2dede;
+  color: #a94442;
+}
+
 /* Estilos responsivos */
 @media (max-width: 768px) {
   .container {

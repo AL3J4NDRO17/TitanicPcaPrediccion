@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Predicción de Supervivencia del Titanic</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
   <div class="container">
     <h1 class="title">¿Sobrevivirías al Titanic?</h1>
@@ -41,8 +43,61 @@
       </div>
 
       <div class="form-group">
-        <label for="cabin">Número de Cabina:</label>
-        <input type="text" id="cabin" name="cabin" placeholder="Ej: C85 (opcional)">
+        <label for="cabin">Cabina:</label>
+        <select id="cabin" name="cabin">
+          <option value="">Sin cabina asignada</option>
+
+          <optgroup label="Cubierta A">
+            <option value="A23">A23</option>
+            <option value="A26">A26</option>
+            <option value="A31">A31</option>
+            <option value="A36">A36</option>
+          </optgroup>
+
+          <optgroup label="Cubierta B">
+            <option value="B20">B20</option>
+            <option value="B22">B22</option>
+            <option value="B28">B28</option>
+            <option value="B35">B35</option>
+            <option value="B57">B57</option>
+          </optgroup>
+
+          <optgroup label="Cubierta C">
+            <option value="C23">C23</option>
+            <option value="C50">C50</option>
+            <option value="C68">C68</option>
+            <option value="C85">C85</option>
+            <option value="C123">C123</option>
+          </optgroup>
+
+          <optgroup label="Cubierta D">
+            <option value="D10">D10</option>
+            <option value="D17">D17</option>
+            <option value="D19">D19</option>
+            <option value="D33">D33</option>
+          </optgroup>
+
+          <optgroup label="Cubierta E">
+            <option value="E12">E12</option>
+            <option value="E24">E24</option>
+            <option value="E36">E36</option>
+            <option value="E63">E63</option>
+          </optgroup>
+
+          <optgroup label="Cubierta F">
+            <option value="F2">F2</option>
+            <option value="F4">F4</option>
+            <option value="F33">F33</option>
+          </optgroup>
+
+          <optgroup label="Cubierta G">
+            <option value="G6">G6</option>
+          </optgroup>
+
+          <optgroup label="Cubierta T (especial)">
+            <option value="T">T</option>
+          </optgroup>
+        </select>
       </div>
 
       <button type="submit">Predecir Supervivencia</button>
@@ -73,33 +128,35 @@
         },
         body: `gender=${gender}&age=${age}&fare=${fare}&pclass=${pclass}&cabin=${cabin}`,
       })
-      .then(response => response.json())
-      .then(data => {
-        const resultadoElement = document.getElementById('resultado');
-        if (data.error) {
-          resultadoElement.innerText = 'Error: ' + data.error;
-          resultadoElement.style.color = '#d9534f'; // Rojo para error
-        } else {
-          // Asumiendo que 'data.categoria' contendrá "Sobrevivió" o "No Sobrevivió"
-          if (data.categoria === 'Sobrevivió') {
-            resultadoElement.innerText = '¡El pasajero probablemente SOBREVIVIÓ!';
-            resultadoElement.style.color = '#5cb85c'; // Verde para éxito
-          } else if (data.categoria === 'No Sobrevivió') {
-            resultadoElement.innerText = 'El pasajero probablemente NO SOBREVIVIÓ.';
-            resultadoElement.style.color = '#d9534f'; // Rojo para no sobrevivió
+        .then(response => response.json())
+        .then(data => {
+          const resultadoElement = document.getElementById('resultado');
+          resultadoElement.className = 'result-message ' + (data.categoria === 'Sobrevivió' ? 'success' : 'fail');
+          if (data.error) {
+            resultadoElement.innerText = 'Error: ' + data.error;
+            resultadoElement.style.color = '#d9534f'; // Rojo para error
           } else {
-            resultadoElement.innerText = 'Resultado de la clasificación: ' + data.categoria;
-            resultadoElement.style.color = '#333'; // Color por defecto
+            // Asumiendo que 'data.categoria' contendrá "Sobrevivió" o "No Sobrevivió"
+            if (data.categoria === 'Sobrevivió') {
+              resultadoElement.innerText = '¡El pasajero probablemente SOBREVIVIÓ!';
+              resultadoElement.style.color = '#5cb85c'; // Verde para éxito
+            } else if (data.categoria === 'No Sobrevivió') {
+              resultadoElement.innerText = 'El pasajero probablemente NO SOBREVIVIÓ.';
+              resultadoElement.style.color = '#d9534f'; // Rojo para no sobrevivió
+            } else {
+              resultadoElement.innerText = 'Resultado de la clasificación: ' + data.categoria;
+              resultadoElement.style.color = '#333'; // Color por defecto
+            }
           }
-        }
-      })
-      .catch(error => {
-        const resultadoElement = document.getElementById('resultado');
-        resultadoElement.innerText = 'Error en la solicitud. Por favor, inténtelo de nuevo.';
-        resultadoElement.style.color = '#d9534f'; // Rojo para error
-        console.error('Error:', error);
-      });
+        })
+        .catch(error => {
+          const resultadoElement = document.getElementById('resultado');
+          resultadoElement.innerText = 'Error en la solicitud. Por favor, inténtelo de nuevo.';
+          resultadoElement.style.color = '#d9534f'; // Rojo para error
+          console.error('Error:', error);
+        });
     }
   </script>
 </body>
+
 </html>
